@@ -6,7 +6,6 @@ import pandas as pd
 #  initialize window
 window = Tk()
 
-# todo
 #  function for button
 def click():
     entered_input = textentry_input.get()
