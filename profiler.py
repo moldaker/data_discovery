@@ -1,4 +1,5 @@
 import pandas as pd
+import os 
 
 #  todo type checker function
 #  todo histograms / value_counts
@@ -119,23 +120,55 @@ def field_summary(df):
     return stats
 
 # def visual_profiling():
-#     for col in df.columns:
-#         if is_int(col):
-#
-#
-#
-#
-#         elif is_float(col):
-#
-#
-#         elif df[col].dtype == 'object':
-#
-#         elif df[col].dtype == 'datetime64[ns]':
-#
-#         else:
-#             print("Wrong Type - '{}' is {}".format(col, df[col].dtype))  # todo change logic
-#
-#
+def visual_profiling(df):
+    #creating folders to input visuals
+    folders = ['int_histograms', 'float_histograms', 'object_counts', 'datetime_counts']
+    for folder in folders:
+        os.mkdir(folder)
+    
+    def is_int(column):  # helper function
+        return (df[column].dtype == 'int64' or df[column].dtype == 'int32' or
+            df[column].dtype == 'int16' or df[column].dtype == 'int8')
+
+    def is_float(column):  # helper function
+        return (df[column].dtype == 'float64' or df[column].dtype == 'float32' or 
+            df[column].dtype == 'float16')
+    
+    for col in df.columns:
+        if is_int(col):
+            if df[col].isnull().sum() < len(df[col]):
+                fig = plt.figure(figsize=(10, 8));
+                sns.distplot(df[col], kde=False)
+                fig.savefig(f"int_histograms\{col}.png")
+                plt.close()
+
+        elif is_float(col):
+            if df[col].isnull().sum() < len(df[col]):
+                fig = plt.figure(figsize=(10, 8));
+                sns.distplot(df[col], kde=False)
+                fig.savefig(f"float_histograms\{col}.png")    
+                plt.close()
+                
+        elif df[col].dtype == 'object':        
+            if df[col].isnull().sum() < len(df[col]):
+                fig = plt.figure(figsize=(10, 8));
+                val_counts = df[col].value_counts()
+                sns.barplot(x=val_counts.index, y=val_counts)
+                plt.xticks(rotation=90)
+                fig.savefig(f"object_counts\{col}.png")    
+                plt.close()
+                
+        elif df[col].dtype == 'datetime64[ns]':
+            if df[col].isnull().sum() < len(df[col]):
+                year_month = pd.DataFrame(df[col].dt.to_period('M')) # getting high level period: year-month 
+                year_month = year_month.groupby(col)[col].count()
+                fig = plt.figure(figsize=(10, 8));
+                year_month.plot(figsize = (10,8))
+                fig.savefig(f"datetime_counts\{col}.png")    
+                plt.close()
+        else:
+            raise TypeError('Type Not Accounted For')
+
 
 # calling functions within other functions
 def overall_summary(df, path_start):
