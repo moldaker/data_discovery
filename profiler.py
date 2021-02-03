@@ -2,8 +2,10 @@ import pandas as pd
 import os 
 
 #  todo type checker function
-#  todo histograms / value_counts
 #  todo field relationship finder
+#  todo determine scope of helper functions
+#  link new profiler function to gui
+#  revise gui input
 
 def table_summary(df):
     columns = df.shape[1]
