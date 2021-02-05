@@ -123,6 +123,8 @@ def field_summary(df):
 
 # def visual_profiling():
 def visual_profiling(df):
+
+    
     #creating folders to input visuals
     folders = ['int_histograms', 'float_histograms', 'object_counts', 'datetime_counts']
     for folder in folders:
