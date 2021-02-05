@@ -25,7 +25,7 @@ window.configure(background='black')
 Label(window, text="What is your file path?", bg="black", fg="white", font="segoe 12 bold").grid(row=1, column=0, sticky=W)
 
 #  add text entry box for file path
-textentry_input = Entry(window, width=50, bg="grey")
+textentry_input = Entry(window, width=100, bg="grey")
 textentry_input.grid(row=2, column=0, sticky=W)
 
 #  add image and label
