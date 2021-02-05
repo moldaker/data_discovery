@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 import os 
 
 #  todo type checker function
@@ -123,8 +125,6 @@ def field_summary(df):
 
 # def visual_profiling():
 def visual_profiling(df):
-
-    
     #creating folders to input visuals
     folders = ['int_histograms', 'float_histograms', 'object_counts', 'datetime_counts']
     for folder in folders:
@@ -175,13 +175,14 @@ def visual_profiling(df):
 
 
 # calling functions within other functions
-def overall_summary(df, path_start):
-    write_location = path_start + r"\data_summary.xlsx"
-    writer = pd.ExcelWriter(write_location, engine='xlsxwriter')  # creating excel
+def overall_summary(df):
+    writer = pd.ExcelWriter("data_summary.xlsx", engine='xlsxwriter')  # creating excel
     table_summary(df).to_excel(writer, sheet_name='table_summary')  # writing table summary
     field_summary(df).to_excel(writer, sheet_name='field_summary')
     writer.save()  # saving
 
     print(table_summary(df))
     print(field_summary(df))
+
+    visual_profiling(df)
 
