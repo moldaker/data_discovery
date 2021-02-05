@@ -9,7 +9,7 @@ window = Tk()
 #  function for button
 def click():
     entered_input = textentry_input.get()
-    data = pd.read_csv(entered_input)
+    data = pd.read_pickle(entered_input)
 
     # entered_ouput = textentry_output.get()
     overall_summary(data)
