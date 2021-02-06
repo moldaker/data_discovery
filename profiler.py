@@ -63,8 +63,8 @@ def field_summary(df):
             ["count", "nulls", "count unique", "mean", "sum", "std", "skewness", "kurtosis", "min"] +
             ["{:.0%}".format(x) for x in percentiles] + ['max']
                     )
-    object_index = ["count", "count unique", "top", "frequency"]
-    datetime_index = ["count", "count unique", "top", "frequency", "min", "max"]
+    object_index = ["count", "nulls", "count unique", "top", "frequency"]
+    datetime_index = ["count", "nulls", "count unique", "top", "frequency", "min", "max"]
     stats = pd.Series(dtype='object')  # this is default type for empty series - avoiding future warnings
 
     def is_int(column):  # helper function
@@ -98,7 +98,7 @@ def field_summary(df):
 
         elif df[col].dtype == 'object':
             result = (
-                      [df[col].count(), df[col].nunique(), df[col].value_counts().index[0],
+                      [df[col].count(), df[col].isnull().sum(), df[col].nunique(), df[col].value_counts().index[0],
                        df[col].value_counts()[0]]
                       )
             result_srs = pd.Series(result, index=object_index, name=df[col].name)
@@ -107,7 +107,7 @@ def field_summary(df):
 
         elif df[col].dtype == 'datetime64[ns]':
             result = (
-                     [df[col].count(), df[col].nunique(), df[col].value_counts().index[0],
+                     [df[col].count(), df[col].isnull().sum(), df[col].nunique(), df[col].value_counts().index[0],
                       df[col].value_counts()[0], df[col].min(), df[col].max()]
                      )
             result_srs = pd.Series(result, index=datetime_index, name=df[col].name)
@@ -120,7 +120,7 @@ def field_summary(df):
     stats = stats.drop(columns=[0])
     if len(stats.columns) != len(df.columns):
         raise TypeError(
-            'Some columns cannot be summarized - exceptions above!')  # should flow of exceptions be different?
+            'Some columns cannot be summarized!')  #  todo change flow
     return stats
 
 # def visual_profiling():
