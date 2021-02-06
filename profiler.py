@@ -115,12 +115,9 @@ def field_summary(df):
             stats = summary
 
         else:
-            print("Wrong Type - '{}' is {}".format(col, df[col].dtype))  # todo change logic
-
+            raise TypeError(f'fields including {col} of type {df[col].dtype} cannot be summarized')
+            
     stats = stats.drop(columns=[0])
-    if len(stats.columns) != len(df.columns):
-        raise TypeError(
-            'Some columns cannot be summarized!')  #  todo change flow
     return stats
 
 # def visual_profiling():
@@ -155,12 +152,13 @@ def visual_profiling(df):
                 
         elif df[col].dtype == 'object':        
             if df[col].isnull().sum() < len(df[col]):
-                fig = plt.figure(figsize=(10, 8));
-                val_counts = df[col].value_counts()
-                sns.barplot(x=val_counts.index, y=val_counts)
-                plt.xticks(rotation=90)
-                fig.savefig(f"object_counts\{col}.png")    
-                plt.close()
+                if df[col].nunique() <= 50:  #  hard coded max number of categories to graph - could change to dynamic after
+                    fig = plt.figure(figsize=(10, 8));
+                    val_counts = df[col].value_counts()
+                    sns.barplot(x=val_counts.index, y=val_counts)
+                    plt.xticks(rotation=90)
+                    fig.savefig(f"object_counts\{col}.png")    
+                    plt.close()
                 
         elif df[col].dtype == 'datetime64[ns]':
             if df[col].isnull().sum() < len(df[col]):
@@ -180,9 +178,12 @@ def overall_summary(df):
     table_summary(df).to_excel(writer, sheet_name='table_summary')  # writing table summary
     field_summary(df).to_excel(writer, sheet_name='field_summary')
     writer.save()  # saving
+    
+    print('data summary complete')
 
-    print(table_summary(df))
-    print(field_summary(df))
+    print('... working on visual profiling ...')
 
     visual_profiling(df)
+
+    print('visual profiling complete')
 
