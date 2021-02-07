@@ -120,7 +120,24 @@ def field_summary(df):
     stats = stats.drop(columns=[0])
     return stats
 
-# def visual_profiling():
+
+def correlation_scores(df):
+    corr = df.corr()
+    correlation_df = pd.DataFrame()
+
+    for index, value in enumerate(corr.columns):
+        corr_column = pd.DataFrame(corr.iloc[:,index]) # make dataframe of each colum correlation scores
+        corr_column['column2'] = value # creating new column to determine which column is correlation
+        corr_column.rename(columns = {f'{value}':'correlation_score'}, inplace=True) # rename to correlation score          
+        correlation_df = pd.concat([correlation_df, corr_column]) # concatenate columns
+
+    correlation_df.reset_index(inplace=True)
+    correlation_df.rename(columns = {'index':'column1'}, inplace=True)
+    correlation_df = correlation_df[['column1', 'column2', 'correlation_score']]
+    correlation_df = correlation_df[(correlation_df['correlation_score'].isnull() != True) & (correlation_df['correlation_score'] != 1)].sort_values('correlation_score', ascending=False)
+    return correlation_df
+
+
 def visual_profiling(df):
     #creating folders to input visuals
     folders = ['int_histograms', 'float_histograms', 'object_counts', 'datetime_counts']
@@ -177,13 +194,14 @@ def overall_summary(df):
     writer = pd.ExcelWriter("data_summary.xlsx", engine='xlsxwriter')  # creating excel
     table_summary(df).to_excel(writer, sheet_name='table_summary')  # writing table summary
     field_summary(df).to_excel(writer, sheet_name='field_summary')
+    correlation_scores(df).to_excel(writer, sheet_name='correlation_scores')
     writer.save()  # saving
     
-    print('data summary complete')
+    print('... data summary complete')
 
-    print('... working on visual profiling ...')
+    print('... working on visual profiling')
 
     visual_profiling(df)
 
-    print('visual profiling complete')
+    print('... visual profiling complete')
 
