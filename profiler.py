@@ -194,7 +194,7 @@ def overall_summary(df):
     writer = pd.ExcelWriter("data_summary.xlsx", engine='xlsxwriter')  # creating excel
     table_summary(df).to_excel(writer, sheet_name='table_summary')  # writing table summary
     field_summary(df).to_excel(writer, sheet_name='field_summary')
-    correlation_scores(df).to_excel(writer, sheet_name='correlation_scores')
+    correlation_scores(df).to_excel(writer, sheet_name='correlation_scores', index=False)
     writer.save()  # saving
     
     print('... data summary complete')
