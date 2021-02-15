@@ -5,9 +5,12 @@ import os
 
 #  todo type checker function
 #  todo field relationship finder
-#  todo determine scope of helper functions
-#  link new profiler function to gui
-#  revise gui input
+#  scoping helper functions
+#  doc string
+#  commenting
+#  read me
+#  scope of functions
+
 
 def table_summary(df):
     columns = df.shape[1]
@@ -138,12 +141,16 @@ def correlation_scores(df):
     return correlation_df
 
 
-def visual_profiling(df):
-    #creating folders to input visuals
-    folders = ['int_histograms', 'float_histograms', 'object_counts', 'datetime_counts']
+def visual_profiling(df, num_values = None):
+    max_values = 50 
+    folders = ['int_histograms', 'float_histograms', 'object_counts', 'datetime_counts']  
+
     for folder in folders:
-        os.mkdir(folder)
-    
+        if os.path.exists(os.path.join(os.getcwd(), f'{folder}')) == False: #  check if directory already exists
+            os.mkdir(folder)
+        else:
+            pass
+
     def is_int(column):  # helper function
         return (df[column].dtype == 'int64' or df[column].dtype == 'int32' or
             df[column].dtype == 'int16' or df[column].dtype == 'int8')
@@ -151,7 +158,7 @@ def visual_profiling(df):
     def is_float(column):  # helper function
         return (df[column].dtype == 'float64' or df[column].dtype == 'float32' or 
             df[column].dtype == 'float16')
-    
+
     for col in df.columns:
         if is_int(col):
             if df[col].isnull().sum() < len(df[col]):
@@ -169,14 +176,23 @@ def visual_profiling(df):
                 
         elif df[col].dtype == 'object':        
             if df[col].isnull().sum() < len(df[col]):
-                if df[col].nunique() <= 50:  #  hard coded max number of categories to graph - could change to dynamic after
-                    fig = plt.figure(figsize=(10, 8));
-                    val_counts = df[col].value_counts()
-                    sns.barplot(x=val_counts.index, y=val_counts)
-                    plt.xticks(rotation=90)
-                    fig.savefig(f"object_counts\{col}.png")    
-                    plt.close()
-                
+                if num_values is None:
+                    if df[col].nunique() <= max_values:  #  ehard coded max numbr of categories to graph as default to avoid high cardinal graphing
+                        fig = plt.figure(figsize=(10, 8));
+                        val_counts = df[col].value_counts()
+                        sns.barplot(x=val_counts.index, y=val_counts)
+                        plt.xticks(rotation=90)
+                        fig.savefig(f"object_counts\{col}.png")    
+                        plt.close()
+                elif num_values is not None:
+                    if df[col].nunique() <= num_values:  #  ehard coded max numbr of categories to graph as default to avoid high cardinal graphing
+                        fig = plt.figure(figsize=(10, 8));
+                        val_counts = df[col].value_counts()
+                        sns.barplot(x=val_counts.index, y=val_counts)
+                        plt.xticks(rotation=90)
+                        fig.savefig(f"object_counts\{col}.png")    
+                        plt.close()
+
         elif df[col].dtype == 'datetime64[ns]':
             if df[col].isnull().sum() < len(df[col]):
                 year_month = pd.DataFrame(df[col].dt.to_period('M')) # getting high level period: year-month 
@@ -190,9 +206,9 @@ def visual_profiling(df):
 
 
 # calling functions within other functions
-def overall_summary(df):
-    writer = pd.ExcelWriter("data_summary.xlsx", engine='xlsxwriter')  # creating excel
-    table_summary(df).to_excel(writer, sheet_name='table_summary')  # writing table summary
+def overall_summary(df, num_values = None):
+    writer = pd.ExcelWriter("data_summary.xlsx", engine='xlsxwriter')  
+    table_summary(df).to_excel(writer, sheet_name='table_summary')  
     field_summary(df).to_excel(writer, sheet_name='field_summary')
     correlation_scores(df).to_excel(writer, sheet_name='correlation_scores', index=False)
     writer.save()  # saving
@@ -200,8 +216,11 @@ def overall_summary(df):
     print('... data summary complete')
 
     print('... working on visual profiling')
-
-    visual_profiling(df)
+    
+    if num_values is None:
+        visual_profiling(df)
+    elif num_values is not None:
+        visual_profiling(df, num_values)
 
     print('... visual profiling complete')
 

@@ -1,6 +1,6 @@
 # import library
 from tkinter import *
-from profiler import table_summary, field_summary, overall_summary
+from profiler import *
 import pandas as pd
 
 #  initialize window
