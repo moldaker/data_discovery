@@ -134,15 +134,15 @@ def correlation_scores(df):
     return correlation_df
 
 
-def visual_profiling(df, num_values = None):
-    max_values = 50
+def visual_profiling(df, num_values =  None):
+
+    max_values = 50 if num_values == None else num_values
+
     folders = ['int_histograms', 'float_histograms', 'object_counts', 'datetime_counts']
 
     for folder in folders:
-        if os.path.exists(os.path.join(os.getcwd(), f'{folder}')) == False:
+        if not os.path.exists(os.path.join(os.getcwd(), folder)):
             os.mkdir(folder)
-        else:
-            pass
 
     def is_int(column):
         return (df[column].dtype == 'int64' or df[column].dtype == 'int32' or
@@ -168,22 +168,13 @@ def visual_profiling(df, num_values = None):
 
         elif df[col].dtype == 'object':
             if df[col].isnull().sum() < len(df[col]):
-                if num_values is None:
-                    if df[col].nunique() <= max_values:
-                        fig = plt.figure(figsize=(10, 8));
-                        val_counts = df[col].value_counts()
-                        sns.barplot(x=val_counts.index, y=val_counts)
-                        plt.xticks(rotation=90)
-                        fig.savefig(f"object_counts\{col}.png")
-                        plt.close()
-                elif num_values is not None:
-                    if df[col].nunique() <= num_values:
-                        fig = plt.figure(figsize=(10, 8));
-                        val_counts = df[col].value_counts()
-                        sns.barplot(x=val_counts.index, y=val_counts)
-                        plt.xticks(rotation=90)
-                        fig.savefig(f"object_counts\{col}.png")
-                        plt.close()
+                if df[col].nunique() <= max_values:
+                    fig = plt.figure(figsize=(10, 8));
+                    val_counts = df[col].value_counts()
+                    sns.barplot(x=val_counts.index, y=val_counts)
+                    plt.xticks(rotation=90)
+                    fig.savefig(f"object_counts\{col}.png")
+                    plt.close()
 
         elif df[col].dtype == 'datetime64[ns]':
             if df[col].isnull().sum() < len(df[col]):
@@ -209,10 +200,7 @@ def overall_summary(df, num_values = None):
 
     print('... working on visual profiling')
 
-    if num_values is None:
-        visual_profiling(df)
-    elif num_values is not None:
-        visual_profiling(df, num_values)
+    visual_profiling(df, num_values)
 
     print('... visual profiling complete')
 
